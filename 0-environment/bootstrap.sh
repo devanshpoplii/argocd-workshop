@@ -89,6 +89,24 @@ else
     --set vpcId=$VPC_ID \
     --wait
 
+  # Fix missing permission for newer LB controller versions
+  LBC_ROLE=$(kubectl get sa aws-load-balancer-controller -n kube-system -o jsonpath='{.metadata.annotations.eks\.amazonaws\.com/role-arn}' | grep -oP '(?<=role/).*')
+  if [ -n "$LBC_ROLE" ]; then
+    aws iam put-role-policy \
+      --role-name $LBC_ROLE \
+      --policy-name DescribeListenerAttributes \
+      --policy-document '{
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": "elasticloadbalancing:DescribeListenerAttributes",
+            "Resource": "*"
+          }
+        ]
+      }'
+  fi
+
   echo "Waiting for controller to be ready..."
   kubectl wait --for=condition=available deployment/aws-load-balancer-controller \
     -n kube-system --timeout=120s

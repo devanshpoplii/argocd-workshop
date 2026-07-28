@@ -1,110 +1,137 @@
-# Module 0: Environment Setup
+# Module 1: ArgoCD Installation
 
 ## Objective
 
-Prepare the workshop environment by verifying your EKS cluster, installing prerequisites, and creating your Git repository.
+Install ArgoCD on your EKS cluster, expose the UI, and verify access.
 
 ## Outcome
 
 By the end of this module, you will have:
 
-- ✔ A working EKS cluster
-- ✔ AWS Load Balancer Controller installed
-- ✔ A CodeCommit repository
-- ✔ A local Git working directory
+- ✔ ArgoCD installed in the `argocd` namespace
+- ✔ All ArgoCD components running
+- ✔ ArgoCD UI accessible via browser
+- ✔ ArgoCD CLI installed and logged in
 
 ---
 
-## 0.1 Verify the Environment
+## 1.1 Install ArgoCD
 
-Your EKS cluster has already been provisioned. Let's verify access.
+ArgoCD runs as a set of Kubernetes components inside your cluster. It needs its own namespace.
 
 ```bash
-# Check which cluster you're connected to
-kubectl config current-context
+# Create a dedicated namespace
+kubectl create namespace argocd
 
-# Switch to the workshop cluster
-aws eks update-kubeconfig --name eks-workshop
-
-# List worker nodes (should show Ready)
-kubectl get nodes
-
-# List namespaces
-kubectl get ns
-
-# List all running pods across namespaces
-kubectl get pods -A
+# Install ArgoCD
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --server-side
 ```
 
-**Quick orientation:**
+This installs several components. Let's verify they're running:
 
-| Component | What it is |
-|-----------|-----------|
-| Control Plane | Managed by AWS (you don't see these pods) |
-| Worker Nodes | EC2 instances running your workloads |
-| kube-system | Namespace for cluster infrastructure components |
-| default | Namespace where resources go if you don't specify one |
+```bash
+# Wait for all pods to be ready
+kubectl get pods -n argocd -w
+```
+
+You should see the following components:
+
+| Component | What it does |
+|-----------|-------------|
+| `argocd-server` | API server — serves the UI and CLI requests |
+| `argocd-repo-server` | Clones Git repos and generates manifests |
+| `argocd-application-controller` | Watches applications, detects drift, performs sync |
+| `argocd-redis` | In-memory cache for performance |
+| `argocd-applicationset-controller` | Generates Applications from templates |
+| `argocd-dex-server` | Handles SSO/authentication |
+
+All pods should show `Running` and `1/1` Ready before proceeding.
 
 ---
 
-## 0.2 Download the Bootstrap Script
+## 1.2 Expose the ArgoCD UI
+
+By default, the ArgoCD server is only accessible inside the cluster (`ClusterIP`). Let's expose it externally using a Load Balancer.
 
 ```bash
-curl -O https://raw.githubusercontent.com/devanshpoplii/argocd-immersion-day/main/0-environment/bootstrap.sh
-chmod +x bootstrap.sh
+# Change the service type to LoadBalancer
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 ```
+
+Wait ~2 minutes for AWS to provision the load balancer, then get the URL:
+
+```bash
+# Get the load balancer hostname
+kubectl get svc argocd-server -n argocd -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+```
+
+Open this URL in your browser with `https://` prefix.
+
+> ⚠️ You'll see a certificate warning — this is expected. The default ArgoCD installation uses a self-signed certificate. Click "Advanced" → "Proceed" to continue.
 
 ---
 
-## 0.3 Bootstrap the Environment
+## 1.3 Get the Admin Password
 
-Rather than performing several infrastructure tasks manually, the bootstrap script sets everything up.
+ArgoCD creates an initial admin password stored as a Kubernetes Secret. The password is base64-encoded.
 
 ```bash
-./bootstrap.sh
+# Get and decode the initial admin password
+kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath='{.data.password}' | base64 -d
+echo
 ```
 
-**What the script does:**
+Now login to the UI:
 
-| Step | Action |
-|------|--------|
-| 1 | Installs AWS Load Balancer Controller |
-| 2 | Creates CodeCommit repository |
-
-Wait for the script to complete before proceeding.
+- **Username:** `admin`
+- **Password:** *(output from above)*
 
 ---
 
-## 0.4 Clone the Repository
+## 1.4 Install the ArgoCD CLI
 
-Clone the repository created during bootstrap:
-
-```bash
-git clone codecommit::us-west-2://argocd-workshop
-cd argocd-workshop
-```
-
-This repository will become the **single source of truth** for everything deployed by ArgoCD throughout the workshop.
-
-Right now, it's empty. Every manifest you create during the workshop will be committed and pushed here.
-
-**Initialize with a README:**
+The CLI lets you manage ArgoCD from the terminal — useful for scripting and faster operations.
 
 ```bash
-echo "# ArgoCD Workshop" > README.md
-git add .
-git commit -m "Initial commit"
-git push
+# Download the CLI
+curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+chmod +x argocd
+sudo mv argocd /usr/local/bin/
+
+# Verify installation
+argocd version --client
 ```
+
+Login via CLI:
+
+```bash
+# Get the ArgoCD server hostname
+ARGOCD_SERVER=$(kubectl get svc argocd-server -n argocd -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+
+# Login (--insecure because of self-signed cert)
+argocd login $ARGOCD_SERVER --username admin --password $(kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath='{.data.password}' | base64 -d) --insecure
+```
+
+You should see: `'admin:login' logged in successfully`
+
+---
+
+## 1.5 Explore the UI
+
+Take a moment to look around the ArgoCD UI:
+
+- **Applications** — Currently empty. We'll create our first one in the next module.
+- **Settings → Repositories** — No repos connected yet.
+- **Settings → Projects** — You'll see a `default` project.
+- **Settings → Clusters** — Shows `in-cluster` (the cluster ArgoCD is running on).
 
 ---
 
 ## End State
 
-At the end of Module 0, you should have:
+At the end of Module 1, you should have:
 
-- ✔ Connected to the EKS cluster
-- ✔ AWS Load Balancer Controller installed
-- ✔ CodeCommit repository created
-- ✔ Local Git repository cloned and initialized
-- ✔ Ready to install ArgoCD
+- ✔ ArgoCD installed and all pods Running
+- ✔ UI accessible via browser (Load Balancer URL)
+- ✔ Logged in as admin (UI and CLI)
+- ✔ Ready to deploy your first application
