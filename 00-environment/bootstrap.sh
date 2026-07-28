@@ -134,6 +134,37 @@ else
   echo "✔ Repository created"
 fi
 
+# Create IAM user for ArgoCD to access CodeCommit
+CC_USER="argocd-codecommit"
+if aws iam get-user --user-name $CC_USER &>/dev/null 2>&1; then
+  echo "✔ IAM user '$CC_USER' already exists"
+else
+  aws iam create-user --user-name $CC_USER > /dev/null
+  aws iam attach-user-policy --user-name $CC_USER --policy-arn arn:aws:iam::aws:policy/AWSCodeCommitReadOnly
+  echo "✔ IAM user '$CC_USER' created with CodeCommit read access"
+fi
+
+# Generate HTTPS Git credentials for ArgoCD
+CRED_OUTPUT=$(aws iam create-service-specific-credential \
+  --user-name $CC_USER \
+  --service-name codecommit.amazonaws.com 2>/dev/null)
+
+if [ -n "$CRED_OUTPUT" ]; then
+  CC_USERNAME=$(echo $CRED_OUTPUT | jq -r '.ServiceSpecificCredential.ServiceUserName')
+  CC_PASSWORD=$(echo $CRED_OUTPUT | jq -r '.ServiceSpecificCredential.ServicePassword')
+  echo "✔ Git credentials generated"
+  echo ""
+  echo "  ┌────────────────────────────────────────────────┐"
+  echo "  │ Run the following commands to save credentials: │"
+  echo "  ├────────────────────────────────────────────────┤"
+  echo "  │ export CC_USERNAME=$CC_USERNAME"
+  echo "  │ export CC_PASSWORD=$CC_PASSWORD"
+  echo "  └────────────────────────────────────────────────┘"
+  echo ""
+else
+  echo "⚠ Git credentials already exist. Using existing credentials."
+fi
+
 # Get clone URLs
 HTTPS_URL=$(aws codecommit get-repository \
   --repository-name $REPO_NAME \
