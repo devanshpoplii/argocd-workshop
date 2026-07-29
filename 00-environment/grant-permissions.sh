@@ -16,39 +16,20 @@ fi
 
 echo "✔ Detected IDE Role: $IDE_ROLE"
 echo ""
-echo "  ┌──────────────────────────────────────────────────────────────────┐"
-echo "  │ Run the following commands in CloudShell (not here):             │"
-echo "  ├──────────────────────────────────────────────────────────────────┤"
-echo "  │                                                                  │"
-cat <<EOF
-  aws iam detach-role-policy \\
-    --role-name $IDE_ROLE \\
-    --policy-arn arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-
-  aws iam put-role-policy \\
-    --role-name $IDE_ROLE \\
-    --policy-name ArgoCD-Workshop-Policy \\
-    --policy-document '{
-      "Version": "2012-10-17",
-      "Statement": [
-        {
-          "Effect": "Allow",
-          "Action": [
-            "eks:*",
-            "ec2:*",
-            "elasticloadbalancing:*",
-            "iam:*",
-            "codecommit:*",
-            "sts:*",
-            "cloudformation:*"
-          ],
-          "Resource": "*"
-        }
-      ]
-    }'
-EOF
+echo "Run the following commands in CloudShell (not here):"
 echo ""
-echo "  └──────────────────────────────────────────────────────────────────┘"
+echo "---"
 echo ""
-echo "  After running in CloudShell, come back here and continue."
+echo "aws iam detach-role-policy \\"
+echo "  --role-name $IDE_ROLE \\"
+echo "  --policy-arn arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+echo ""
+echo "aws iam put-role-policy \\"
+echo "  --role-name $IDE_ROLE \\"
+echo "  --policy-name ArgoCD-Workshop-Policy \\"
+echo "  --policy-document '{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Action\":[\"eks:*\",\"ec2:*\",\"elasticloadbalancing:*\",\"iam:*\",\"codecommit:*\",\"sts:*\",\"cloudformation:*\",\"sso:*\",\"identitystore:*\",\"sso-directory:*\",\"organizations:*\",\"secretsmanager:*\"],\"Resource\":\"*\"}]}'"
+echo ""
+echo "---"
+echo ""
+echo "After running in CloudShell, come back here and continue."
 echo ""
