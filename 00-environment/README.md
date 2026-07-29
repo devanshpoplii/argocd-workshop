@@ -19,7 +19,7 @@ Prepare the workshop environment by verifying your EKS cluster, installing prere
 Your IDE role needs additional permissions for this workshop. Run this in your IDE terminal:
 
 ```bash
-curl -O https://raw.githubusercontent.com/devanshpoplii/argocd-immersion-day/main/00-environment/grant-permissions.sh
+curl -O https://raw.githubusercontent.com/devanshpoplii/argocd-workshop/main/00-environment/grant-permissions.sh
 chmod +x grant-permissions.sh
 ./grant-permissions.sh
 ```
@@ -67,7 +67,7 @@ kubectl get pods -A
 ## 0.3 Download the Bootstrap Script
 
 ```bash
-curl -O https://raw.githubusercontent.com/devanshpoplii/argocd-immersion-day/main/00-environment/bootstrap.sh
+curl -O https://raw.githubusercontent.com/devanshpoplii/argocd-workshop/main/00-environment/bootstrap.sh
 chmod +x bootstrap.sh
 ```
 
