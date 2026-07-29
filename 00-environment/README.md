@@ -14,7 +14,24 @@ Prepare the workshop environment by verifying your EKS cluster, installing prere
 
 ---
 
-## 0.1 Verify the Environment
+## 0.1 Grant Permissions to IDE
+
+Your IDE role needs additional permissions for this workshop. Run this in your IDE terminal:
+
+```bash
+curl -O https://raw.githubusercontent.com/devanshpoplii/argocd-immersion-day/main/0-environment/grant-permissions.sh
+chmod +x grant-permissions.sh
+./grant-permissions.sh
+```
+
+The script will output a command. **Copy that command and run it in CloudShell** (not in the IDE).
+
+> [!IMPORTANT]
+> Open CloudShell from the AWS Console (top-right icon). Paste and run the command there, then come back to the IDE.
+
+---
+
+## 0.2 Verify the Environment
 
 Your EKS cluster has already been provisioned. Let's verify access.
 
@@ -47,7 +64,7 @@ kubectl get pods -A
 
 ---
 
-## 0.2 Download the Bootstrap Script
+## 0.3 Download the Bootstrap Script
 
 ```bash
 curl -O https://raw.githubusercontent.com/devanshpoplii/argocd-immersion-day/main/0-environment/bootstrap.sh
@@ -56,7 +73,7 @@ chmod +x bootstrap.sh
 
 ---
 
-## 0.3 Bootstrap the Environment
+## 0.4 Bootstrap the Environment
 
 Rather than performing several infrastructure tasks manually, the bootstrap script sets everything up.
 
@@ -76,7 +93,7 @@ Rather than performing several infrastructure tasks manually, the bootstrap scri
 
 ---
 
-## 0.4 Clone the Repository
+## 0.5 Clone the Repository
 
 Clone the repository created during bootstrap:
 
