@@ -10,7 +10,11 @@
 
 ## 🎯 Objective
 
-Prepare the workshop environment by verifying your EKS cluster, installing prerequisites, and creating your Git repository.
+In this module, we'll set up our working environment:
+
+- Verify that our EKS cluster is running
+- Create a **Git repository** (CodeCommit) where we'll store all our Kubernetes manifest files throughout the workshop
+- Install the **AWS Load Balancer Controller** so we can expose services externally
 
 ---
 
@@ -64,36 +68,29 @@ kubectl get pods -A
 
 ---
 
-## 0.3 Download the Bootstrap Script
+## 0.3 Bootstrap the Environment
+
+We need two things before we can start working with ArgoCD:
+
+1. **AWS Load Balancer Controller** — this allows Kubernetes Services to create Network Load Balancers (NLBs) on AWS, which we'll use to access ArgoCD from the browser.
+2. **A CodeCommit Git repository** — this is where we'll store all our Kubernetes manifest files. ArgoCD will watch this repository and deploy whatever we put in it.
+
+Rather than setting these up manually, we'll use a bootstrap script that does both.
+
+**Download and run the script:**
 
 ```bash
 curl -O https://raw.githubusercontent.com/devanshpoplii/argocd-workshop/main/00-environment/bootstrap.sh
 chmod +x bootstrap.sh
-```
-
----
-
-## 0.4 Bootstrap the Environment
-
-Rather than performing several infrastructure tasks manually, the bootstrap script sets everything up.
-
-```bash
 ./bootstrap.sh
 ```
 
-**What the script does:**
-
-| Step | Action |
-|------|--------|
-| 1 | Installs AWS Load Balancer Controller |
-| 2 | Creates CodeCommit repository |
-
 > [!IMPORTANT]
-> Wait for the script to complete before proceeding.
+> Wait for the script to complete before proceeding. It will print your Git credentials at the end — you won't need them (we use `git-remote-codecommit` for authentication), but note them just in case.
 
 ---
 
-## 0.5 Clone the Repository
+## 0.4 Clone the Repository
 
 Clone the repository created during bootstrap:
 
@@ -143,3 +140,9 @@ At the end of Module 0, you should have:
 - [x] CodeCommit repository created
 - [x] Local Git repository cloned and initialized
 - [x] Ready to install ArgoCD
+
+---
+
+<p align="center">
+  <b>Next up → <a href="../1-argocd-installation/">Module 1: Install ArgoCD</a></b>
+</p>
