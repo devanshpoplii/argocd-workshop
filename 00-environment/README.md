@@ -86,7 +86,7 @@ chmod +x bootstrap.sh
 ```
 
 > [!IMPORTANT]
-> Wait for the script to complete before proceeding. It will print your Git credentials at the end — you won't need them (we use `git-remote-codecommit` for authentication), but note them just in case.
+> Wait for the script to complete before proceeding. It will print your Git credentials at the end — note them down, we'll need them later when connecting ArgoCD to our repository.
 
 ---
 

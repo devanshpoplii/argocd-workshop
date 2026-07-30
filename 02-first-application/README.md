@@ -85,11 +85,28 @@ spec:
           cat <<HTML > /html/index.html
           <!DOCTYPE html>
           <html>
-          <head><title>Book Store</title></head>
-          <body style="font-family: sans-serif; text-align: center; padding: 50px;">
-            <h1>📚 Online Book Store</h1>
-            <h2>Version 1.0</h2>
-            <p>Welcome to the ArgoCD Workshop</p>
+          <head>
+            <meta charset="UTF-8">
+            <title>Book Store</title>
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: #fff; }
+              .container { text-align: center; padding: 60px 40px; background: rgba(255,255,255,0.05); border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); max-width: 500px; }
+              .icon { font-size: 4rem; margin-bottom: 20px; }
+              h1 { font-size: 2.5rem; margin-bottom: 10px; background: linear-gradient(to right, #e94560, #f5a623); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+              .version { display: inline-block; background: #e94560; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; margin: 15px 0; }
+              .tagline { color: #a0a0b0; font-size: 1.1rem; margin-top: 15px; }
+              .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); color: #606080; font-size: 0.8rem; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="icon">&#128218;</div>
+              <h1>Online Book Store</h1>
+              <span class="version">v1.0</span>
+              <p class="tagline">Deployed with ArgoCD GitOps</p>
+              <div class="footer">ArgoCD Immersion Day Workshop</div>
+            </div>
           </body>
           </html>
           HTML
@@ -371,3 +388,9 @@ We'll understand exactly what these statuses mean and how they're computed in Mo
 ---
 
 > **What's Next:** We just created a single YAML file called an Application, and ArgoCD deployed everything into Kubernetes. But what actually happened behind the scenes? That's what we'll explore in the next module.
+
+---
+
+<p align="center">
+  <b>Next up → <a href="../3-architecture/">Module 3: ArgoCD Architecture</a></b>
+</p>
