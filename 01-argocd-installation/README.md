@@ -10,7 +10,11 @@
 
 ## 🎯 Objective
 
-Install ArgoCD on your EKS cluster, expose the UI, and verify access.
+In this module, we'll:
+
+- Install ArgoCD on our EKS cluster
+- Expose the ArgoCD UI so we can access it from the browser
+- Log in and verify everything is working
 
 ---
 
@@ -37,10 +41,9 @@ kubectl get pods -n argocd
 
 ## 1.2 Expose the ArgoCD UI
 
-By default, the ArgoCD server is only accessible inside the cluster (`ClusterIP`). Let's expose it externally using a Network Load Balancer.
+By default, the ArgoCD server is only accessible inside the cluster (`ClusterIP`). We'll expose it externally using a Network Load Balancer so we can access the UI from our browser.
 
 ```bash
-# Patch the service to use an internet-facing NLB
 kubectl patch svc argocd-server -n argocd -p '{
   "metadata": {
     "annotations": {
@@ -71,12 +74,19 @@ echo "ArgoCD URL: $(kubectl get svc argocd-server -n argocd -o jsonpath='{.statu
 
 ## 1.3 Get the Admin Password
 
+ArgoCD creates a default user called `admin` during installation. The password for this user is stored inside a Kubernetes Secret object.
+
+Let's fetch it:
+
 ```bash
-# Decode the initial admin password
 echo "Password: $(kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath='{.data.password}' | base64 -d)"
 ```
 
-Login to the UI:
+---
+
+## 1.4 Login to the UI
+
+Open the ArgoCD URL in your browser and log in with:
 
 | Field | Value |
 |-------|-------|
@@ -85,7 +95,9 @@ Login to the UI:
 
 ---
 
-## 1.4 Login via CLI
+## 1.5 Login via CLI
+
+We'll also use the ArgoCD CLI throughout the workshop. Let's authenticate it now.
 
 ```bash
 # Store the ArgoCD server hostname
@@ -100,7 +112,7 @@ argocd login $ARGOCD_SERVER --username admin --password $(kubectl get secret arg
 
 ---
 
-## 1.5 Explore the UI
+## 1.6 Explore the UI
 
 Take a moment to look around:
 
@@ -129,7 +141,13 @@ Take a moment to look around:
 
 At the end of Module 1, you should have:
 
-- [x] ArgoCD installed and all pods Running
+- [x] ArgoCD installed and all pods running
 - [x] UI accessible via browser (NLB URL)
 - [x] Logged in as admin (UI and CLI)
 - [x] Ready to deploy your first application
+
+---
+
+<p align="center">
+  <b>Next up → <a href="../2-first-application/">Module 2: Deploy Your First Application</a></b>
+</p>
