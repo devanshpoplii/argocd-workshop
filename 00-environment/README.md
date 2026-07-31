@@ -144,5 +144,5 @@ At the end of Module 0, you should have:
 ---
 
 <p align="center">
-  <b>Next up → <a href="../1-argocd-installation/">Module 1: Install ArgoCD</a></b>
+  <b>Next up → <a href="../01-argocd-installation/">Module 1: Install ArgoCD</a></b>
 </p>
