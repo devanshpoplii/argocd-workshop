@@ -251,8 +251,10 @@ We're starting with **manual sync**. We want to see the deployment process ourse
 
 ### Full Application Manifest
 
+Let's create this file **outside** the repo directory — it's an ArgoCD configuration, not part of the application source code.
+
 ```bash
-REPO_URL=$(aws codecommit get-repository --repository-name argocd-workshop --query "repositoryMetadata.cloneUrlHttp" --output text)
+cd ~/environment
 
 cat <<EOF > application.yaml
 apiVersion: argoproj.io/v1alpha1
@@ -274,6 +276,9 @@ spec:
   syncPolicy: {}
 EOF
 ```
+
+> [!NOTE]
+> `$REPO_URL` was already set when we registered the repository in step 2.3.
 
 Apply it:
 
