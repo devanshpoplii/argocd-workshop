@@ -133,6 +133,8 @@ kubectl delete application bookstore -n argocd
 Now create the ApplicationSet:
 
 ```bash
+cd ~/environment
+
 cat <<EOF > applicationset-list.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
@@ -227,7 +229,18 @@ kubectl delete applicationset workshop-apps-list -n argocd
 
 Now create a Git Generator:
 
+The Git Generator scans a directory pattern in your repo. For each matching folder, it provides two variables:
+
+| Variable | What it resolves to | Example |
+|----------|---------------------|---------|
+| `{{path}}` | Full path of the matched directory | `apps/bookstore` |
+| `{{path.basename}}` | Just the folder name (last segment) | `bookstore` |
+
+So if your repo has `apps/bookstore/` and `apps/inventory/`, the generator will iterate twice — once for each — and create an Application for each using these variables in the template.
+
 ```bash
+cd ~/environment
+
 cat <<EOF > applicationset-git.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
