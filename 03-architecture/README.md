@@ -76,19 +76,20 @@ Now that we know the components, let's understand the two core operations that A
 
 ## 3.3 Refresh
 
-**Refresh** = "Go check Git and tell me if anything changed."
+**Refresh** = Compare the latest code in Git (the **target state**) with what's actually running in the cluster (the **live state**). Figure out what is different.
 
 - It does **NOT** change your cluster
-- It only updates ArgoCD's knowledge of what Git currently contains
+- It only updates ArgoCD's knowledge of whether the target state and live state match
 
 **What happens internally:**
 
 ```
 1. Controller asks Repo Server: "What's the latest commit?"
-2. Repo Server checks Git
-3. Controller compares Git manifests vs what's in the cluster
-4. Controller updates the Application status (Synced/OutOfSync)
-5. NOTHING is deployed or changed in the cluster
+2. Repo Server checks Git → this is the target state
+3. Controller looks at the cluster → this is the live state
+4. Controller compares target state vs live state
+5. Controller updates the Application status (Synced/OutOfSync)
+6. NOTHING is deployed or changed in the cluster
 ```
 
 ### Automatic vs Manual Refresh
@@ -138,15 +139,15 @@ Still shows **2 replicas**. The cluster hasn't changed. ArgoCD knows there's a d
 
 ## 3.4 Sync
 
-**Sync** = "Apply all the manifests from Git into the cluster to make them match."
+**Sync** = The process of making the **live state** match the **target state**. ArgoCD applies the manifests from Git into the cluster.
 
-This **changes your cluster**. It takes the desired state from Git and makes it the live state.
+This **changes your cluster**. It takes the target state (Git) and makes it the live state (cluster).
 
 **What happens internally:**
 
 ```
-1. Controller takes the desired manifests (from Git)
-2. Applies all of them to the target cluster
+1. Controller takes the target state (manifests from Git)
+2. Applies them to the cluster (changing the live state)
 3. Waits for resources to become ready
 4. Updates Application status
 ```
@@ -212,12 +213,12 @@ Since we're using **manual sync**, step 3 doesn't happen automatically. ArgoCD d
 
 ## 3.6 Sync Status
 
-After every refresh, ArgoCD answers: **"Does the cluster match Git?"**
+After every refresh, ArgoCD answers: **"Does the live state match the target state?"**
 
 | Status | Meaning |
 |--------|---------|
-| ✅ **Synced** | Cluster matches Git. No action needed. |
-| 🟡 **OutOfSync** | There's a difference between Git and the cluster. |
+| ✅ **Synced** | Live state matches target state. The cluster is exactly what Git says it should be. |
+| 🟡 **OutOfSync** | Live state does NOT match target state. Something is different. |
 | ❓ **Unknown** | Can't determine state (e.g., Repo Server down, cluster unreachable). |
 
 You already observed both **Synced** and **OutOfSync** during the Refresh and Sync replications above.
@@ -226,17 +227,17 @@ You already observed both **Synced** and **OutOfSync** during the Refresh and Sy
 
 ## 3.7 Health Status
 
-Sync status tells you: **"Does the cluster match Git?"**
+Sync status tells you: **"Does the live state match the target state?"**
 
-Health status tells you: **"Is the application actually working?"**
+Health status tells you: **"Is the application actually working? Can it serve requests?"**
 
 These are **independent**:
 
 | Sync | Health | What it means |
 |------|--------|---------------|
-| Synced | Healthy | Everything perfect ✅ |
-| Synced | Degraded | Git matches cluster, but pods are crashing 💥 |
-| OutOfSync | Healthy | Old version running fine, new version not applied yet |
+| Synced | Healthy | Live state matches target state, and everything is running ✅ |
+| Synced | Degraded | Live state matches target state, but pods are crashing 💥 |
+| OutOfSync | Healthy | Live state doesn't match target state, but old version still works fine |
 
 ### Health Statuses
 
@@ -289,12 +290,14 @@ argocd app sync bookstore
 
 | Concept | One-liner |
 |---------|-----------|
-| Refresh | Check Git, update status (no cluster changes) |
-| Sync | Apply Git manifests to cluster (cluster changes) |
-| Reconciliation Loop | Continuous cycle: refresh → diff → maybe sync |
-| Sync Status | Does the cluster match Git? |
-| Health Status | Is the application working? |
+| Target State | What Git says should be running |
+| Live State | What is actually running in the cluster |
+| Refresh | Compare target state with live state (no cluster changes) |
+| Sync | Make the live state match the target state (cluster changes) |
+| Sync Status | Does the live state match the target state? |
+| Health Status | Is the application running correctly? Can it serve requests? |
 | They're independent | You can be Synced but Degraded |
+| Reconciliation Loop | Continuous cycle: refresh → diff → maybe sync |
 
 ---
 

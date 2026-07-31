@@ -392,6 +392,20 @@ We'll understand exactly what these statuses mean and how they're computed in Mo
 
 ---
 
+---
+
+## 📖 Terminology
+
+Before moving on, let's define a few terms you'll see throughout the workshop:
+
+| Term | Meaning |
+|------|---------|
+| **Target State** | The desired state of your application, as represented by files in Git |
+| **Live State** | The actual state of your application — what pods, services, etc. are currently running in the cluster |
+| **Sync** | The process of making the live state match the target state (e.g., applying changes to the cluster) |
+
+---
+
 > **What's Next:** We just created a single YAML file called an Application, and ArgoCD deployed everything into Kubernetes. But what actually happened behind the scenes? That's what we'll explore in the next module.
 
 ---
