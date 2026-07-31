@@ -299,3 +299,9 @@ argocd app sync bookstore
 ---
 
 > **What's Next:** We've been syncing manually every time. In the next module, we'll enable **automated sync** so ArgoCD deploys changes automatically when Git changes — and reverts manual cluster changes back to Git state.
+
+---
+
+<p align="center">
+  <b>Next up → <a href="../04-sync-policies/">Module 4: Sync Policies</a></b>
+</p>
