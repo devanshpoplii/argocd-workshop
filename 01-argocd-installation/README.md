@@ -149,5 +149,5 @@ At the end of Module 1, you should have:
 ---
 
 <p align="center">
-  <b>Next up → <a href="../2-first-application/">Module 2: Deploy Your First Application</a></b>
+  <b>Next up → <a href="../02-first-application/">Module 2: Deploy Your First Application</a></b>
 </p>
