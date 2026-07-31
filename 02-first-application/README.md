@@ -397,5 +397,5 @@ We'll understand exactly what these statuses mean and how they're computed in Mo
 ---
 
 <p align="center">
-  <b>Next up → <a href="../3-architecture/">Module 3: ArgoCD Architecture</a></b>
+  <b>Next up → <a href="../03-architecture/">Module 3: ArgoCD Architecture</a></b>
 </p>
